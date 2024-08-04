@@ -1,0 +1,84 @@
+extern crate sdl2;
+
+use sdl2::pixels::Color;
+use sdl2::event::Event;
+use sdl2::keyboard::Keycode;
+use std::time::Duration;
+ 
+pub fn main() {
+    //sdl_context imports sdl2 i think
+    let sdl_context = sdl2::init().unwrap();
+    let video_subsystem = sdl_context.video().unwrap();
+ 
+    let window = video_subsystem.window("Rust Game", 800, 600)
+        .position_centered()
+        .build()
+        .unwrap();
+ 
+    let mut canvas = window.into_canvas().build().unwrap();
+
+    let mut square_x = 0;
+    let mut square_y = 0;
+ 
+    canvas.set_draw_color(Color::BLACK);
+    canvas.clear();
+    canvas.present();
+    let mut event_pump = sdl_context.event_pump().unwrap();
+    'running: loop {
+        for event in event_pump.poll_iter() {
+            match event {
+                Event::Quit {..} |
+                Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
+                    break 'running
+                },
+                _ => {}
+            }
+        };
+
+        for event in event_pump.poll_iter() {
+            //Makes the square go down
+            match event {
+                Event::KeyDown { keycode: Some(Keycode::Down), .. } => {
+                    square_y += 1;
+                },
+                _ => {}
+            }
+
+            //Makes the square go up
+            match event {
+                Event::KeyDown { keycode: Some(Keycode::Up), .. } => {
+                    square_y -= 1;
+                },
+                _ => {}
+            }
+
+            //Makes the square go to the left
+            match event {
+                Event::KeyDown { keycode: Some(Keycode::Left), .. } => {
+                    square_x += 1;
+                },
+                _ => {}
+            }
+
+            //Makes the square go to the right
+            match event {
+                Event::KeyDown { keycode: Some(Keycode::Right), .. } => {
+                    square_x -= 1;
+                },
+                _ => {}
+            }
+        }
+
+        // Clear canvas
+        canvas.set_draw_color(Color::BLACK);
+        canvas.clear();
+
+        // Draw square
+        canvas.set_draw_color(Color::WHITE);
+        canvas.fill_rect(sdl2::rect::Rect::new(square_x, square_y, 50, 50)).unwrap();
+
+        //Present canvas and set delay for the frame rate
+        canvas.present();
+        ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
+    }
+}
